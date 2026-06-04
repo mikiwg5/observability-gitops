@@ -1,0 +1,10 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - grafana.yaml
+  - tempo.yaml
+  - otel-collector.yaml
+  - vmagent.yaml
+  - vmcluster.yaml
+  - vmlogs.yaml
+  - k8s-app.yaml
