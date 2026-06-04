@@ -1,0 +1,65 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMCluster
+metadata:
+  name: vmcluster
+  namespace: monitoring
+spec:
+  retentionPeriod: "7d"
+  useStrictSecurity: false
+
+  vmstorage:
+    replicaCount: 2
+    serviceAccountName: vmcluster-vmstorage
+    storageDataPath: "/vmstorage-data"
+    useStrictSecurity: false
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: RuntimeDefault
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "lab1-wlt-cl01-vsan-policy-tanzu"
+          resources:
+            requests:
+              storage: 5Gi
+
+  vminsert:
+    replicaCount: 1
+    serviceAccountName: vmcluster-vminsert
+    useStrictSecurity: false
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: RuntimeDefault
+
+  vmselect:
+    replicaCount: 1
+    serviceAccountName: vmcluster-vmselect
+    cacheMountPath: "/select-cache"
+    useStrictSecurity: false
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: ["ALL"]
+      runAsNonRoot: false
+      runAsUser: 0
+      seccompProfile:
+        type: RuntimeDefault
+    storage:
+      volumeClaimTemplate:
+        spec:
+          accessModes: ["ReadWriteOnce"]
+          storageClassName: "lab1-wlt-cl01-vsan-policy-tanzu"
+          resources:
+            requests:
+              storage: 1Gi

@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-datasources
+  namespace: monitoring
+
+data:
+  datasources.yaml: |
+    apiVersion: 1
+
+    datasources:
+      - name: Tempo
+        type: tempo
+        uid: tempo
+        access: proxy
+        url: http://tempo.monitoring.svc:3200
+
+      - name: VictoriaMetrics
+        type: prometheus
+        uid: vmcluster
+        access: proxy
+        url: http://vmselect-vmcluster:8481/select/0/prometheus
+        isDefault: true
+
+      - name: VictoriaLogs
+        type: victoriametrics-logs-datasource
+        uid: vmlogs
+        access: proxy
+        url: http://vlselect-vmlogs:9471
