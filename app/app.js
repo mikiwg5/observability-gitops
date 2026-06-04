@@ -26,7 +26,10 @@ app.get('/', (req, res) => {
 app.get('/work', async (req, res) => {
   await new Promise(r => setTimeout(r, Math.random() * 200));
   log('Handling GET /work');
-  res.json({ status: 'done' });
+    res.json({
+    status: 'done',
+    flux_test: 'VERSION_1'
+  });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
