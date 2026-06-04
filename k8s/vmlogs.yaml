@@ -1,0 +1,27 @@
+apiVersion: operator.victoriametrics.com/v1
+kind: VLCluster
+metadata:
+  name: vmlogs
+  namespace: monitoring
+
+spec:
+  retentionPeriod: "7d"
+
+  vlstorage:
+    replicaCount: 1
+
+    storage:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: lab1-wlt-cl01-vsan-policy-tanzu
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+
+  vlinsert:
+    replicaCount: 1
+
+  vlselect:
+    replicaCount: 1

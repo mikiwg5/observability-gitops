@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: express-demo
+  namespace: default
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: express-demo
+
+  template:
+    metadata:
+      labels:
+        app: express-demo
+
+    spec:
+      containers:
+        - name: express-demo
+          image: mikiyasworkineh/express-otel-demo
+          imagePullPolicy: Always
+
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+
+          ports:
+            - containerPort: 3000
+
+          env:
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: "http://otel-collector-collector:4318"
+
+---
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: express-demo
+
+spec:
+  selector:
+    app: express-demo
+
+  ports:
+    - port: 3000
+      targetPort: 3000

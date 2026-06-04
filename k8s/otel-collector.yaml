@@ -1,0 +1,69 @@
+apiVersion: opentelemetry.io/v1beta1
+kind: OpenTelemetryCollector
+
+metadata:
+  name: otel-collector
+  namespace: default
+
+spec:
+  securityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    runAsNonRoot: true
+    runAsUser: 1000
+    seccompProfile:
+      type: RuntimeDefault
+
+  config:
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    processors:
+      batch: {}
+      memory_limiter:
+        check_interval: 1s
+        limit_mib: 256
+
+    exporters:
+      prometheusremotewrite:
+        endpoint: "http://vminsert-vmcluster.monitoring.svc:8480/insert/0/prometheus/api/v1/write"
+        tls:
+          insecure: true
+
+      otlphttp/tempo:
+        endpoint: "http://tempo.monitoring.svc:4318"
+        tls:
+          insecure: true
+
+      otlphttp/vmlogs:
+        endpoint: "http://vlinsert-vmlogs.monitoring.svc:9481/insert/opentelemetry"
+        tls:
+          insecure: true
+        
+
+      debug:
+        verbosity: detailed
+
+    service:
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/tempo, debug]
+
+        metrics:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [prometheusremotewrite, debug]
+
+        logs:
+          receivers: [otlp]
+          processors: [memory_limiter, batch]
+          exporters: [otlphttp/vmlogs, debug]
