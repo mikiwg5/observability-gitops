@@ -46,6 +46,7 @@ kind: Service
 
 metadata:
   name: express-demo
+  namespace: default 
 
 spec:
   selector:
